@@ -32,4 +32,9 @@ public interface EmployeeMapper {
 
     //员工账号的启用和🈲用
     void update(Employee employee);
+
+
+    //根据ID查询员工信息
+    @Select("select * from employee where id = #{id}")
+    Employee getById(Long id);
 }
