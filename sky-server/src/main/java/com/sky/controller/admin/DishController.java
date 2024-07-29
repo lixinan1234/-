@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @author:lixinan
  * @email:2489460735@qq.com
@@ -43,4 +45,14 @@ public class DishController {
         PageResult pageResult = dishService.pageQuery(dishPageQueryDTO);
         return Result.success(pageResult);
     }
+
+    //批量删除
+    @DeleteMapping
+    @ApiOperation("批量删除")
+    public Result delete(@RequestParam List<Long> ids){
+        log.info("批量删除的是：{}",ids);
+        dishService.deleteBatch(ids);
+        return Result.success();
+    }
+
 }
