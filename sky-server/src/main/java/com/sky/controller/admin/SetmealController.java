@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * @author:lixinan
  * @email:2489460735@qq.com
@@ -45,4 +47,11 @@ public class SetmealController {
     }
 
 
+    //批量删除套餐
+    @ApiOperation("批量删除套餐")
+    @DeleteMapping
+    public Result delete(@RequestParam List<Long> ids){
+        setmealService.deleteBatch(ids);
+        return Result.success();
+    }
 }
