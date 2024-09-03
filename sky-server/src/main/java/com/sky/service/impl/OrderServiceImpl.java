@@ -6,9 +6,7 @@ import com.github.pagehelper.PageHelper;
 import com.github.xiaoymin.knife4j.core.util.CollectionUtils;
 import com.sky.constant.MessageConstant;
 import com.sky.context.BaseContext;
-import com.sky.dto.OrdersPageQueryDTO;
-import com.sky.dto.OrdersPaymentDTO;
-import com.sky.dto.OrdersSubmitDTO;
+import com.sky.dto.*;
 import com.sky.entity.*;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.SetmealEnableFailedException;
@@ -20,6 +18,7 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -38,6 +37,7 @@ import java.util.stream.Collectors;
  * @datetime: 2024/8/27 15:58
  */
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
     @Autowired
@@ -312,6 +312,76 @@ public class OrderServiceImpl implements OrderService {
         orderStatisticsVO.setDeliveryInProgress(deliveryInProgress);
         return orderStatisticsVO;
     }
+
+
+    //接单
+    @Override
+    public void confirm(OrdersConfirmDTO ordersConfirmDTO) {
+        // 创建一个 Orders 对象，使用 builder 模式
+           Orders orders = Orders.builder()
+                   .id(ordersConfirmDTO.getId())// 设置订单 ID
+                   .status(Orders.CONFIRMED)// 设置订单状态为已接单
+                   .build();// 构建 Orders 对象
+           orderMapper.update(orders);// 更新订单信息
+    }
+
+    //取消订单
+    @Override
+    public void cancel(OrdersCancelDTO ordersCancelDTO) throws Exception {
+           //跟据id查询订单
+        Orders ordersDB = orderMapper.getById(ordersCancelDTO.getId());
+
+        //支付状态
+        Integer payStatus = ordersDB.getPayStatus();
+        if(payStatus == 1){
+           /* //用户已支付，需要退款
+            String refund = weChatPayUtil.refund(
+                    ordersDB.getNumber(),
+                    ordersDB.getNumber(),
+                    new BigDecimal(0.01),
+                    new BigDecimal(0.01));
+            log.info("申请退款：{}", refund);*/
+        }
+
+
+        //管理端取消订单需要退款，根据订单id更新订单状态、取消原因、取消时间
+        Orders orders = new Orders();
+        orders.setId(ordersCancelDTO.getId());
+        orders.setStatus(Orders.CANCELLED);
+        orders.setCancelReason(ordersCancelDTO.getCancelReason());
+        orders.setCancelTime(LocalDateTime.now());
+        orderMapper.update(orders);
+    }
+
+    //订单派送
+    @Override
+    public void delivery(Long id) {
+        // 根据id查询订单
+        Orders ordersDB = orderMapper.getById(id);
+
+        // 校验订单是否存在，并且状态为3
+        if(ordersDB == null && ordersDB.getStatus().equals(Orders.CONFIRMED)){
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        Orders orders = new Orders();
+        orders.setId(ordersDB.getId());
+
+        // 更新订单状态,状态转为派送中
+        orders.setStatus(Orders.DELIVERY_IN_PROGRESS);
+
+        orderMapper.update(orders);
+    }
+
+
+
+
+
+
+
+
+
+
 
     private List<OrderVO> getOrderVOList(Page<Orders> page) {
         // 需要返回订单菜品信息，自定义OrderVO响应结果
