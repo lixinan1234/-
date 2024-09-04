@@ -53,10 +53,12 @@ public interface OrderService {
     //取消订单
     void cancel(OrdersCancelDTO ordersCancelDTO) throws Exception;
 
-
     //订单派送
     void delivery(Long id);
 
     //完成订单
     void complete(Long id);
+
+    //催单
+    void reminder(Long id);
 }

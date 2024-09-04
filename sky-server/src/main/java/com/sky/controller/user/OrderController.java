@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -92,6 +93,15 @@ public class OrderController {
     public Result repetition(@PathVariable Long id){
         log.info("再来一单的id:{}",id);
         orderService.repetition(id);
+        return Result.success();
+    }
+
+
+    //催单
+    @GetMapping("/reminder/{id}")
+    @ApiOperation("催单")
+    public Result reminder(@PathVariable("id") Long id){
+        orderService.reminder(id);
         return Result.success();
     }
 
