@@ -54,4 +54,8 @@ sky:
   wechat:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
+  #shop:
+    #address: 江西省南昌市红谷滩区生米镇阁皂山大道998号南昌工学院
+  #baidu:
+    #ak: 38xx7R9ClyQdPj1PRjxXzgSdvRpaT3LK
 
