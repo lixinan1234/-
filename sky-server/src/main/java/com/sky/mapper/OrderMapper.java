@@ -75,4 +75,7 @@ public interface OrderMapper {
 
     //跟据动态条件统计营业额数据
     Double sumByMap(Map map);
+
+    //跟据动态条件统计新增用户数量
+
 }
